@@ -222,7 +222,7 @@ if __name__ == '__main__':
     f = open("TSP.csv", "r")
     reader= csv.reader(f)
     # Load the map
-    map_original = cv2.imread('map2.jpg')
+    map_original = cv2.imread('map.jpg')
 
     # Setup cities and tour
     tourmanager = TourManager()
@@ -235,7 +235,7 @@ if __name__ == '__main__':
         print(y,"\n")
 
         tourmanager.addCity(City(x=x, y=y))
-        cv2.circle(map_original, center=(int(7*x), int(7*y)), radius=1, color=(0, 0, 255), thickness=-1, lineType=cv2.LINE_AA)
+        cv2.circle(map_original, center=(int(9*x), int(9*y)), radius=1, color=(0, 0, 255), thickness=-1, lineType=cv2.LINE_AA)
 
     cv2.imshow('map', map_original)
     cv2.waitKey(0)
@@ -259,9 +259,9 @@ if __name__ == '__main__':
         for j in range(1, n_cities):
             cv2.line(
                 map_result,
-                pt1=(int(7*fittest[j - 1].x), int(7*fittest[j - 1].y)),
-                pt2=(int(7*fittest[j].x), int(7*fittest[j].y)),
-                color=(255, 0, 0),
+                pt1=(int(9*fittest[j - 1].x), int(9*fittest[j - 1].y)),
+                pt2=(int(9*fittest[j].x), int(9*fittest[j].y)),
+                color=(((i%2))*200, 0, ((i+1)%2)*200),
                 thickness=1,
                 lineType=cv2.LINE_AA
             )
