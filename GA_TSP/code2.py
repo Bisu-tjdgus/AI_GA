@@ -143,12 +143,22 @@ class Population:
                 fittest = self.getTour(i)
         return fittest
 
+    def getFittest2(self):
+        fittest = self.tours[0]
+        max = self.getFittest().getFitness()
+        for i in range(0, self.populationSize()):
+            if (max - fittest.getFitness()) >= (max - self.getTour(i).getFitness()):
+                fittest = self.getTour(i)
+        return fittest
+
+
+
     def populationSize(self):
         return len(self.tours)
 
 
 class GA:
-    def __init__(self, tourmanager, mutationRate=0.03, tournamentSize=100, elitism=True):
+    def __init__(self, tourmanager, mutationRate=0.03, tournamentSize=50, elitism=True):
         self.tourmanager = tourmanager
         self.mutationRate = mutationRate
         self.tournamentSize = tournamentSize
@@ -160,6 +170,8 @@ class GA:
         if self.elitism:
             newPopulation.saveTour(0, pop.getFittest())
             elitismOffset = 1
+            newPopulation.saveTour(1, pop.getFittest2())
+            elitismOffset = 2
 
         for i in range(elitismOffset, newPopulation.populationSize()):
             parent1 = self.tournamentSelection(pop)
