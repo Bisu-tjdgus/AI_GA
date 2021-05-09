@@ -1,7 +1,8 @@
 import math, random
 import cv2
 import csv
-
+import time
+import datetime
 
 class City:
     def __init__(self, x=None, y=None):
@@ -143,12 +144,22 @@ class Population:
                 fittest = self.getTour(i)
         return fittest
 
+    def getFittest2(self):
+        fittest = self.tours[0]
+        max = self.getFittest().getFitness()
+        for i in range(0, self.populationSize()):
+            if (max - fittest.getFitness()) >= (max - self.getTour(i).getFitness()):
+                fittest = self.getTour(i)
+        return fittest
+
+
+
     def populationSize(self):
         return len(self.tours)
 
 
 class GA:
-    def __init__(self, tourmanager, mutationRate=0.03, tournamentSize=100, elitism=True):
+    def __init__(self, tourmanager, mutationRate=0.025, tournamentSize=75, elitism=True):
         self.tourmanager = tourmanager
         self.mutationRate = mutationRate
         self.tournamentSize = tournamentSize
@@ -160,6 +171,8 @@ class GA:
         if self.elitism:
             newPopulation.saveTour(0, pop.getFittest())
             elitismOffset = 1
+            newPopulation.saveTour(1, pop.getFittest2())
+            elitismOffset = 2
 
         for i in range(elitismOffset, newPopulation.populationSize()):
             parent1 = self.tournamentSelection(pop)
@@ -172,29 +185,38 @@ class GA:
 
         return newPopulation
 
-    def crossover(self, parent1, parent2):
+    def crossover(self, parent1, parent2, ):
         child = Tour(self.tourmanager)
 
-        randomPos =[]
-        for i in range(0,4):
-            randomPos = int(random.random() * parent1.tourSize())
-        randomPos.sort()
-        startPos = randomPos[0]
-        firstPos = randomPos[1]
-        secondPos = randomPos[2]
-        endPos = randomPos[3]
+
+        my_lst = list(random.sample(range(1,100),10))
+        my_lst.sort()
 
         for i in range(0, child.tourSize()):
-            if i<=startPos:
+            if i < my_lst[0]:
                 child.setCity(i, parent1.getCity(i))
-            elif i<=firstPos:
-                child.setCity(i, parent2.getCity(i))
-            elif i<=secondPos:
+
+            elif my_lst[1]<= i < my_lst[2] :
                 child.setCity(i, parent1.getCity(i))
-            elif i<=endPos:
-                child.setCity(i, parent2.getCity(i))
-            else :
+
+            elif my_lst[3]<= i < my_lst[4]:
                 child.setCity(i, parent1.getCity(i))
+
+            elif my_lst[5]<= i < my_lst[6]:
+                child.setCity(i, parent1.getCity(i))
+
+            elif my_lst[7]<= i < my_lst[8]:
+                child.setCity(i, parent1.getCity(i))
+
+            elif my_lst[9]<= i :
+                child.setCity(i, parent1.getCity(i))
+
+        for i in range(0, parent2.tourSize()):
+            if not child.containsCity(parent2.getCity(i)):
+                for ii in range(0, child.tourSize()):
+                    if child.getCity(ii) == None:
+                        child.setCity(ii, parent2.getCity(i))
+                        break
 
         """for i in range(0, child.tourSize()):
             if startPos < endPos and i > startPos and i < endPos:
@@ -202,14 +224,7 @@ class GA:
             elif startPos > endPos:
                 if not (i < startPos and i > endPos):
                     child.setCity(i, parent1.getCity(i))
-        for i in range(0, child.tourSize()):
-            if startPos < endPos and i > startPos and i < endPos:
-                child.setCity(i, parent1.getCity(i))
-            elif startPos > endPos:
-                if not (i < startPos and i > endPos):
-                    child.setCity(i, parent1.getCity(i))
-
-
+       
 
         for i in range(0, parent2.tourSize()):
             if not child.containsCity(parent2.getCity(i)):
@@ -241,11 +256,11 @@ class GA:
 
 
 if __name__ == '__main__':
-    n_cities = 1000
+    n_cities = 100
     population_size = 100
     n_generations = 1000
 
-    f = open("TSP.csv", "r")
+    f = open("TSP2.csv", "r")
     reader= csv.reader(f)
     # Load the map
     map_original = cv2.imread('map.jpg')
@@ -268,6 +283,7 @@ if __name__ == '__main__':
 
     # Initialize population
     print("pop 시작!")
+    starttime= time.time()
     pop = Population(tourmanager, populationSize=population_size, initialise=True)
     print("Initial distance: " + str(pop.getFittest().getDistance()))
 
@@ -306,6 +322,11 @@ if __name__ == '__main__':
     # Print final results
     print("Finished")
     print("Final distance: " + str(pop.getFittest().getDistance()))
+    endtime = time.time()
+    sec = endtime - starttime
+    times = str(datetime.timedelta(seconds=sec)).split(".")
+    times = times[0]
+    print("Time : "+times)
     print("Solution:")
     print(pop.getFittest())
 

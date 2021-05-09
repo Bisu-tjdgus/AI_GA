@@ -1,7 +1,8 @@
 import math, random
 import cv2
 import csv
-
+import time
+import datetime
 
 class City:
     def __init__(self, x=None, y=None):
@@ -158,7 +159,7 @@ class Population:
 
 
 class GA:
-    def __init__(self, tourmanager, mutationRate=0.03, tournamentSize=50, elitism=True):
+    def __init__(self, tourmanager, mutationRate=0.025, tournamentSize=75, elitism=True):
         self.tourmanager = tourmanager
         self.mutationRate = mutationRate
         self.tournamentSize = tournamentSize
@@ -170,8 +171,9 @@ class GA:
         if self.elitism:
             newPopulation.saveTour(0, pop.getFittest())
             elitismOffset = 1
-            newPopulation.saveTour(1, pop.getFittest2())
-            elitismOffset = 2
+            #newPopulation.saveTour(1, pop.getFittest2())
+            #elitismOffset = 2
+
 
         for i in range(elitismOffset, newPopulation.populationSize()):
             parent1 = self.tournamentSelection(pop)
@@ -227,11 +229,11 @@ class GA:
 
 
 if __name__ == '__main__':
-    n_cities = 1000
+    n_cities = 100
     population_size = 100
-    n_generations = 500
+    n_generations = 1000
 
-    f = open("TSP.csv", "r")
+    f = open("TSP2.csv", "r")
     reader= csv.reader(f)
     # Load the map
     map_original = cv2.imread('map.jpg')
@@ -254,6 +256,7 @@ if __name__ == '__main__':
 
     # Initialize population
     print("pop 시작!")
+    starttime = time.time()
     pop = Population(tourmanager, populationSize=population_size, initialise=True)
     print("Initial distance: " + str(pop.getFittest().getDistance()))
 
@@ -280,8 +283,10 @@ if __name__ == '__main__':
 
         cv2.putText(map_result, org=(10, 25), text='Generation: %d' % (i + 1), fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=0.7, color=0, thickness=1, lineType=cv2.LINE_AA)
-        cv2.putText(map_result, org=(10, 50), text='Distance: %.2fkm' % fittest.getDistance(),
+        cv2.putText(map_result, org=(10, 50), text='Distance: %.2f' % fittest.getDistance(),
                     fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.7, color=0, thickness=1, lineType=cv2.LINE_AA)
+        cv2.putText(map_result, org=(10, 950), text='CSI',
+                    fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1, color=0, thickness=1, lineType=cv2.LINE_AA)
         cv2.imshow('map', map_result)
         if cv2.waitKey(100) == ord('q'):
             break
@@ -292,6 +297,11 @@ if __name__ == '__main__':
     # Print final results
     print("Finished")
     print("Final distance: " + str(pop.getFittest().getDistance()))
+    endtime = time.time()
+    sec = endtime - starttime
+    times = str(datetime.timedelta(seconds=sec)).split(".")
+    times = times[0]
+    print("Time : " + times)
     print("Solution:")
     print(pop.getFittest())
 
